@@ -10,3 +10,4 @@ import { AtletasModule } from './atletas/atletas.module';
   providers: [AppService],
 })
 export class AppModule {}
+  
