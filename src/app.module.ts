@@ -13,7 +13,7 @@ import { Atleta } from './atletas/entities/atleta.entity';
       type: 'sqlite',
       database: 'maraton.sqlite',
       entities: [Ciudad, Atleta],
-      synchronize: true, // en producción debe ser false
+      synchronize: true, 
     }),
     CiudadesModule,
     AtletasModule,

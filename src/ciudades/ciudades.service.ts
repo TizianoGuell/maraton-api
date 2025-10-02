@@ -16,6 +16,12 @@ export class CiudadService {
     return this.repo.find();
   }
 
+  async findOne(id: number) {
+    const ciudad = await this.repo.findOne({ where: { id } });
+    if (!ciudad) throw new NotFoundException('Ciudad no encontrada');
+    return ciudad;
+  }
+
   async create(dto: CreateCiudadDto) {
     const ciudad = this.repo.create(dto);
     return this.repo.save(ciudad);

@@ -8,9 +8,15 @@ import { Ciudad } from 'src/ciudades/entities/ciudad.entity';
 
 @Injectable()
 export class AtletaService {
-  findOne(arg0: number) {
-    throw new Error('Method not implemented.');
+  async findOne(id: number) {
+    const atleta = await this.repo.findOne({
+      where: { id },
+      relations: ['ciudad'],
+    });
+    if (!atleta) throw new NotFoundException('Atleta no encontrado');
+    return atleta;
   }
+  
   constructor(
     @InjectRepository(Atleta)
     private repo: Repository<Atleta>,
@@ -19,7 +25,7 @@ export class AtletaService {
   ) {}
 
   findAll() {
-    return this.repo.find(); // gracias a eager:true trae ciudad incluida
+    return this.repo.find(); 
   }
 
   async create(dto: CreateAtletaDto) {
