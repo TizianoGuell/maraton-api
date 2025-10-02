@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Not } from 'typeorm';
+import { Atleta } from './entities/atleta.entity';
 import { CreateAtletaDto } from './dto/create-atleta.dto';
 import { UpdateAtletaDto } from './dto/update-atleta.dto';
+import { Ciudad } from 'src/ciudades/entities/ciudad.entity';
 
 @Injectable()
-export class AtletasService {
-  create(createAtletaDto: CreateAtletaDto) {
-    return 'This action adds a new atleta';
+export class AtletaService {
+  findOne(arg0: number) {
+    throw new Error('Method not implemented.');
   }
+  constructor(
+    @InjectRepository(Atleta)
+    private repo: Repository<Atleta>,
+    @InjectRepository(Ciudad)
+    private ciudadRepo: Repository<Ciudad>,
+  ) {}
 
   findAll() {
-    return `This action returns all atletas`;
+    return this.repo.find(); // gracias a eager:true trae ciudad incluida
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} atleta`;
+  async create(dto: CreateAtletaDto) {
+    const exist = await this.repo.findOne({ where: { dni: dto.dni } });
+    if (exist) throw new BadRequestException('DNI ya registrado');
+
+    const ciudad = await this.ciudadRepo.findOne({ where: { id: dto.ciudadId } });
+    if (!ciudad) throw new BadRequestException('Ciudad no válida');
+
+    const atleta = this.repo.create(dto);
+    return this.repo.save(atleta);
   }
 
-  update(id: number, updateAtletaDto: UpdateAtletaDto) {
-    return `This action updates a #${id} atleta`;
+  async update(id: number, dto: UpdateAtletaDto) {
+    const atleta = await this.repo.findOne({ where: { id } });
+    if (!atleta) throw new NotFoundException('Atleta no encontrado');
+
+    if (dto.dni) {
+      const exist = await this.repo.findOne({ where: { dni: dto.dni, id: Not(id) } });
+      if (exist) throw new BadRequestException('DNI ya registrado por otro atleta');
+    }
+
+    if (dto.ciudadId) {
+      const ciudad = await this.ciudadRepo.findOne({ where: { id: dto.ciudadId } });
+      if (!ciudad) throw new BadRequestException('Ciudad no válida');
+    }
+
+    Object.assign(atleta, dto);
+    return this.repo.save(atleta);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} atleta`;
+  async remove(id: number) {
+    const atleta = await this.repo.findOne({ where: { id } });
+    if (!atleta) throw new NotFoundException('Atleta no encontrado');
+    return this.repo.remove(atleta);
   }
 }

@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCiudadeDto } from './create-ciudade.dto';
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateCiudadeDto extends PartialType(CreateCiudadeDto) {}
+export class UpdateCiudadDto {
+  @IsOptional()
+  @IsString()
+  nombre?: string;
+}
