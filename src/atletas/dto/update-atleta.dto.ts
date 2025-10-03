@@ -7,5 +7,3 @@ export class UpdateAtletaDto {
   @IsOptional() @IsInt() posicion?: number;
   @IsOptional() @IsInt() ciudadId?: number;
 }
-// Si deseas, puedes agregar validaciones adicionales según tus necesidades
-// Por ejemplo, para asegurarte de que el tiempo tenga un formato específico, etc.
